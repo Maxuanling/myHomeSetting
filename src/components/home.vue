@@ -1,6 +1,7 @@
 <template>
   <div class="page">
 
+    <!-- 左侧 -->
     <div class="left">
       <div
         v-for="item in leftCards"
@@ -13,6 +14,7 @@
       </div>
     </div>
 
+    <!-- 右侧 -->
     <div
       class="canvas"
       ref="canvas"
@@ -71,20 +73,42 @@ export default {
 
   methods: {
 
+    // ⭐拖拽迁移（左 → 右）
     onDrop() {
+      if (!this.dragItem) return;
+
       const item = {
         ...this.dragItem,
         uid: Date.now(),
         mockHeight: this.mockHeight[this.dragItem.type]
       };
 
+      // ⭐关键：左侧删除
+      this.leftCards = this.leftCards.filter(
+        i => i.id !== this.dragItem.id
+      );
+
+      // ⭐右侧加入
       this.layoutCards.push(item);
+
       this.relayout();
       this.dragItem = null;
     },
 
     remove(item) {
-      this.layoutCards = this.layoutCards.filter(i => i.uid !== item.uid);
+      // ⭐右 → 左
+      const raw = {
+        id: item.id,
+        type: item.type,
+        title: item.title
+      };
+
+      this.leftCards.push(raw);
+
+      this.layoutCards = this.layoutCards.filter(
+        i => i.uid !== item.uid
+      );
+
       this.relayout();
     },
 
@@ -127,7 +151,7 @@ export default {
       }));
 
       localStorage.setItem("layout_data", JSON.stringify(raw));
-       this.$router.push("/about");
+       this.$router.push("/about"); 
     }
   }
 };

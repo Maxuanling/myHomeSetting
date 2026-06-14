@@ -1,8 +1,8 @@
 export function layoutEngine(items, containerWidth, cols = 3, mode = "design", gap = 10) {
 
-  // ⭐扣掉左右 padding + gap
   const colWidth = (containerWidth - gap * (cols + 1)) / cols;
 
+  // ⭐关键：每次重置，避免重叠
   const colHeights = new Array(cols).fill(0);
 
   const result = [];
@@ -38,17 +38,16 @@ export function layoutEngine(items, containerWidth, cols = 3, mode = "design", g
 
     const baseTop = Math.min(...colHeights.slice(col, col + span));
 
-    // ⭐top统一加gap
     const top = baseTop === 0 ? gap : baseTop + gap;
 
     const height = getHeight(item);
 
     const width = colWidth * span + gap * (span - 1);
 
-    const newHeight = top + height;
+    const newH = top + height;
 
     for (let i = 0; i < span; i++) {
-      colHeights[col + i] = newHeight;
+      colHeights[col + i] = newH;
     }
 
     result.push({

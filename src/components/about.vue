@@ -1,7 +1,6 @@
 <template>
   <div class="home">
     <div class="canvas" ref="canvas">
-
       <div
         v-for="item in layout"
         :key="item.uid"
@@ -10,7 +9,6 @@
       >
         {{ item.title }}
       </div>
-
     </div>
   </div>
 </template>
@@ -35,7 +33,6 @@ export default {
   },
 
   methods: {
-
     load() {
       const raw = JSON.parse(localStorage.getItem("layout_data") || "[]");
 
@@ -85,7 +82,9 @@ export default {
 </script>
 
 <style scoped>
-.home { width: 100%; }
+.home {
+  width: 100%;
+}
 
 .canvas {
   position: relative;
@@ -94,8 +93,9 @@ export default {
 }
 
 .card {
-  border:1px solid #cccccc;
   background: #fff;
   border: 1px solid #ddd;
+  padding: 10px;
+  box-sizing: border-box;
 }
 </style>
