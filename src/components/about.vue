@@ -1,5 +1,5 @@
 <template>
-  <div class="home" style="width:900px;">
+  <div class="home">
     <div class="canvas" ref="canvas">
 
       <div
@@ -41,10 +41,14 @@ export default {
 
       this.layout = raw.map(i => ({
         ...i,
-        uid: Math.random()
+        realHeight: this.getRealHeight(i.type)
       }));
 
       this.relayout();
+    },
+
+    getRealHeight(type) {
+      return type === "long" ? 260 : 140;
     },
 
     relayout() {
@@ -53,7 +57,9 @@ export default {
       this.layout = layoutEngine(
         this.layout,
         width,
-        this.getCols()
+        this.getCols(),
+        "runtime",
+        10
       );
     },
 
@@ -62,7 +68,7 @@ export default {
 
       if (w < 768) return 2;
       if (w < 1024) return 3;
-      return 4;
+      return 3;
     },
 
     style(item) {
@@ -88,8 +94,7 @@ export default {
 }
 
 .card {
-  margin: 6px;
-  padding: 10px;
+  border:1px solid #cccccc;
   background: #fff;
   border: 1px solid #ddd;
 }

@@ -1,9 +1,6 @@
 <template>
-<div>
-  <button @click="save">保存</button>
   <div class="page">
 
-    <!-- 左侧 -->
     <div class="left">
       <div
         v-for="item in leftCards"
@@ -16,7 +13,6 @@
       </div>
     </div>
 
-    <!-- 右侧 -->
     <div
       class="canvas"
       ref="canvas"
@@ -35,32 +31,35 @@
       </div>
 
     </div>
+
+    <button @click="save">保存</button>
+
   </div>
-  <about v-if="showAbout"></about>
-</div>
-  
 </template>
 
 <script>
 import { layoutEngine } from "./layoutEngine";
-import about from './about'
 
 export default {
   data() {
     return {
-      showAbout:false,
       leftCards: [
-        { id: 1, type: "long", heightRatio: 0.25, title: "长卡1" },
-        { id: 2, type: "short", heightRatio: 0.15, title: "短卡1" },
-        { id: 3, type: "short", heightRatio: 0.18, title: "短卡2" },
-        { id: 4, type: "long", heightRatio: 0.28, title: "长卡2" }
+        { id: 1, type: "long", title: "长卡1" },
+        { id: 2, type: "short", title: "短卡1" },
+        { id: 3, type: "short", title: "短卡2" },
+        { id: 4, type: "long", title: "长卡2" }
       ],
 
       layoutCards: [],
-      dragItem: null
+      dragItem: null,
+
+      mockHeight: {
+        long: 180,
+        short: 100
+      }
     };
   },
-  components:{about},
+
   mounted() {
     this.relayout();
     window.addEventListener("resize", this.relayout);
@@ -73,23 +72,19 @@ export default {
   methods: {
 
     onDrop() {
-      if (!this.dragItem) return;
-
       const item = {
         ...this.dragItem,
-        uid: Date.now() + Math.random()
+        uid: Date.now(),
+        mockHeight: this.mockHeight[this.dragItem.type]
       };
 
-      this.leftCards = this.leftCards.filter(i => i.id !== item.id);
       this.layoutCards.push(item);
-
       this.relayout();
       this.dragItem = null;
     },
 
     remove(item) {
       this.layoutCards = this.layoutCards.filter(i => i.uid !== item.uid);
-      this.leftCards.push(item);
       this.relayout();
     },
 
@@ -99,7 +94,9 @@ export default {
       this.layoutCards = layoutEngine(
         this.layoutCards,
         width,
-        this.getCols()
+        this.getCols(),
+        "design",
+        10
       );
     },
 
@@ -108,7 +105,7 @@ export default {
 
       if (w < 768) return 2;
       if (w < 1024) return 3;
-      return 4;
+      return 3;
     },
 
     style(item) {
@@ -122,17 +119,15 @@ export default {
     },
 
     save() {
-      // ⭐只存结构，不存布局
       const raw = this.layoutCards.map(i => ({
         id: i.id,
         type: i.type,
-        heightRatio: i.heightRatio,
+        mockHeight: i.mockHeight,
         title: i.title
       }));
 
       localStorage.setItem("layout_data", JSON.stringify(raw));
-      this.showAbout = true;
-      console.log(raw,'1111')
+       this.$router.push("/about");
     }
   }
 };
@@ -154,7 +149,7 @@ export default {
 }
 
 .card {
-  margin: 6px;
+  margin: 0;
   padding: 10px;
   background: #fff;
   border: 1px solid #ddd;
@@ -162,7 +157,6 @@ export default {
 }
 
 .abs {
-  margin: 0;
   box-sizing: border-box;
 }
 

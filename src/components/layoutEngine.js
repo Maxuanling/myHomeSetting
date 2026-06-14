@@ -1,6 +1,7 @@
-export function layoutEngine(items, containerWidth, cols = 3) {
+export function layoutEngine(items, containerWidth, cols = 3, mode = "design", gap = 10) {
 
-  const colWidth = containerWidth / cols;
+  // ⭐扣掉左右 padding + gap
+  const colWidth = (containerWidth - gap * (cols + 1)) / cols;
 
   const colHeights = new Array(cols).fill(0);
 
@@ -8,9 +9,10 @@ export function layoutEngine(items, containerWidth, cols = 3) {
 
   const getSpan = (item) => item.type === "long" ? 2 : 1;
 
-  const getHeight = (item, containerWidth) => {
-    // ⭐统一高度体系（解决2倍问题关键）
-    return item.heightRatio * containerWidth;
+  const getHeight = (item) => {
+    return mode === "design"
+      ? item.mockHeight
+      : item.realHeight || item.mockHeight;
   };
 
   const findBestCol = (span) => {
@@ -32,25 +34,28 @@ export function layoutEngine(items, containerWidth, cols = 3) {
   items.forEach(item => {
 
     const span = getSpan(item);
-
     const col = findBestCol(span);
 
-    const top = Math.min(...colHeights.slice(col, col + span));
+    const baseTop = Math.min(...colHeights.slice(col, col + span));
 
-    const height = getHeight(item, containerWidth);
-    const width = colWidth * span;
+    // ⭐top统一加gap
+    const top = baseTop === 0 ? gap : baseTop + gap;
 
-    const newH = top + height;
+    const height = getHeight(item);
+
+    const width = colWidth * span + gap * (span - 1);
+
+    const newHeight = top + height;
 
     for (let i = 0; i < span; i++) {
-      colHeights[col + i] = newH;
+      colHeights[col + i] = newHeight;
     }
 
     result.push({
       ...item,
       span,
       top,
-      left: col * colWidth,
+      left: col * (colWidth + gap) + gap,
       width,
       height
     });
