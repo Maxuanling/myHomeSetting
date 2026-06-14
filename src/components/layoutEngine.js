@@ -1,26 +1,28 @@
-export function layoutEngine(items, containerWidth, cols = 3, mode = "design", gap = 10) {
-
+export function layoutEngine(
+  items,
+  containerWidth,
+  cols = 3,
+  mode = "design",
+  gap = 10
+) {
   const colWidth = (containerWidth - gap * (cols + 1)) / cols;
 
-  // ⭐关键：每次重置，避免重叠
   const colHeights = new Array(cols).fill(0);
 
   const result = [];
 
-  const getSpan = (item) => item.type === "long" ? 2 : 1;
+  const getSpan = item => (item.type === "long" ? 2 : 1);
 
-  const getHeight = (item) => {
-    return mode === "design"
-      ? item.mockHeight
-      : item.realHeight || item.mockHeight;
-  };
+  const getHeight = item =>
+    mode === "design" ? item.mockHeight : item.realHeight || item.mockHeight;
 
-  const findBestCol = (span) => {
+  const findBestCol = span => {
     let best = 0;
     let minH = Infinity;
 
     for (let i = 0; i <= cols - span; i++) {
-      const h = Math.min(...colHeights.slice(i, i + span));
+      // ⭐关键修复：long 卡必须用 max，不是 min
+      const h = Math.max(...colHeights.slice(i, i + span));
 
       if (h < minH) {
         minH = h;
@@ -32,11 +34,11 @@ export function layoutEngine(items, containerWidth, cols = 3, mode = "design", g
   };
 
   items.forEach(item => {
-
     const span = getSpan(item);
     const col = findBestCol(span);
 
-    const baseTop = Math.min(...colHeights.slice(col, col + span));
+    // ⭐统一 baseline（关键）
+    const baseTop = Math.max(...colHeights.slice(col, col + span));
 
     const top = baseTop === 0 ? gap : baseTop + gap;
 
@@ -46,6 +48,7 @@ export function layoutEngine(items, containerWidth, cols = 3, mode = "design", g
 
     const newH = top + height;
 
+    // ⭐关键：锁定整组列
     for (let i = 0; i < span; i++) {
       colHeights[col + i] = newH;
     }
@@ -58,7 +61,6 @@ export function layoutEngine(items, containerWidth, cols = 3, mode = "design", g
       width,
       height
     });
-
   });
 
   return result;

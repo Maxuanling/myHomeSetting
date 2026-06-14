@@ -1,6 +1,5 @@
 <template>
   <div class="page">
-
     <!-- 左侧 -->
     <div class="left">
       <div
@@ -15,13 +14,7 @@
     </div>
 
     <!-- 右侧 -->
-    <div
-      class="canvas"
-      ref="canvas"
-      @dragover.prevent
-      @drop="onDrop"
-    >
-
+    <div class="canvas" ref="canvas" @dragover.prevent @drop="onDrop">
       <div
         v-for="item in layoutCards"
         :key="item.uid"
@@ -31,11 +24,9 @@
         {{ item.title }}
         <span class="close" @click="remove(item)">×</span>
       </div>
-
     </div>
 
     <button @click="save">保存</button>
-
   </div>
 </template>
 
@@ -46,10 +37,15 @@ export default {
   data() {
     return {
       leftCards: [
-        { id: 1, type: "long", title: "长卡1" },
-        { id: 2, type: "short", title: "短卡1" },
-        { id: 3, type: "short", title: "短卡2" },
-        { id: 4, type: "long", title: "长卡2" }
+        { id: 1, type: "short", title: "短卡1" },
+        { id: 2, type: "short", title: "短卡2" },
+        { id: 3, type: "short", title: "短卡3" },
+        { id: 4, type: "short", title: "短卡4" },
+        { id: 5, type: "long", title: "长卡5" },
+        { id: 6, type: "long", title: "长卡6" },
+        { id: 7, type: "long", title: "长卡7" },
+        { id: 8, type: "long", title: "长卡8" },
+        { id: 9, type: "long", title: "长卡9" }
       ],
 
       layoutCards: [],
@@ -72,7 +68,6 @@ export default {
   },
 
   methods: {
-
     // ⭐拖拽迁移（左 → 右）
     onDrop() {
       if (!this.dragItem) return;
@@ -84,9 +79,7 @@ export default {
       };
 
       // ⭐关键：左侧删除
-      this.leftCards = this.leftCards.filter(
-        i => i.id !== this.dragItem.id
-      );
+      this.leftCards = this.leftCards.filter(i => i.id !== this.dragItem.id);
 
       // ⭐右侧加入
       this.layoutCards.push(item);
@@ -105,9 +98,7 @@ export default {
 
       this.leftCards.push(raw);
 
-      this.layoutCards = this.layoutCards.filter(
-        i => i.uid !== item.uid
-      );
+      this.layoutCards = this.layoutCards.filter(i => i.uid !== item.uid);
 
       this.relayout();
     },
@@ -151,14 +142,16 @@ export default {
       }));
 
       localStorage.setItem("layout_data", JSON.stringify(raw));
-       this.$router.push("/about"); 
+      this.$router.push("/about");
     }
   }
 };
 </script>
 
 <style scoped>
-.page { display: flex; }
+.page {
+  display: flex;
+}
 
 .left {
   width: 200px;
