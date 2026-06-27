@@ -34,33 +34,35 @@ export function layoutEngine(
   };
 
   items.forEach(item => {
-    const span = getSpan(item);
-    const col = findBestCol(span);
+    if (item) {
+      const span = getSpan(item);
+      const col = findBestCol(span);
 
-    // ⭐统一 baseline（关键）
-    const baseTop = Math.max(...colHeights.slice(col, col + span));
+      // ⭐统一 baseline（关键）
+      const baseTop = Math.max(...colHeights.slice(col, col + span));
 
-    const top = baseTop === 0 ? gap : baseTop + gap;
+      const top = baseTop === 0 ? gap : baseTop + gap;
 
-    const height = getHeight(item);
+      const height = getHeight(item);
 
-    const width = colWidth * span + gap * (span - 1);
+      const width = colWidth * span + gap * (span - 1);
 
-    const newH = top + height;
+      const newH = top + height;
 
-    // ⭐关键：锁定整组列
-    for (let i = 0; i < span; i++) {
-      colHeights[col + i] = newH;
+      // ⭐关键：锁定整组列
+      for (let i = 0; i < span; i++) {
+        colHeights[col + i] = newH;
+      }
+
+      result.push({
+        ...item,
+        span,
+        top,
+        left: col * (colWidth + gap) + gap,
+        width,
+        height
+      });
     }
-
-    result.push({
-      ...item,
-      span,
-      top,
-      left: col * (colWidth + gap) + gap,
-      width,
-      height
-    });
   });
 
   return result;
